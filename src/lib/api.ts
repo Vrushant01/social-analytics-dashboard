@@ -23,13 +23,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle auth errors
+// Handle auth errors: only redirect to login for 401 on protected routes,
+// NOT on /auth/login or /auth/register (so wrong password shows error in form)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      const requestUrl = error.config?.url ?? '';
+      const isAuthEndpoint = /\/auth\/(login|register)$/.test(requestUrl);
+      if (!isAuthEndpoint) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

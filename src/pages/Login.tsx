@@ -19,9 +19,18 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
-    if (!result.success) setError(result.error || 'Login failed');
-    setLoading(false);
+    try {
+      const result = await login(email, password);
+      if (!result.success) {
+        setError(result.error ?? 'Login failed');
+        return;
+      }
+      // Success: AuthContext will update user; Navigate to="/dashboards" handles redirect
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
