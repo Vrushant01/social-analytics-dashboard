@@ -24,18 +24,9 @@ const Register = () => {
       return;
     }
     setLoading(true);
-    try {
-      const result = await register(name, email, password);
-      if (!result.success) {
-        setError(result.error ?? 'Registration failed');
-        return;
-      }
-      // Success: AuthContext will update user; Navigate to="/dashboards" handles redirect
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    const result = await register(name, email, password);
+    if (!result.success) setError(result.error || 'Registration failed');
+    setLoading(false);
   };
 
   return (
