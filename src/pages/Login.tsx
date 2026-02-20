@@ -19,40 +19,31 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
-    if (!result.success) setError(result.error || 'Login failed');
-    setLoading(false);
+
+    try {
+      const result = await login(email, password);
+
+      if (!result?.success) {
+        setError(result?.error || 'Invalid email or password');
+      }
+
+    } catch (err: any) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="gradient-bubble gradient-bubble-1 top-1/4 left-1/4" />
-        <div className="gradient-bubble gradient-bubble-2 top-1/2 right-1/4" />
-        <div className="gradient-bubble gradient-bubble-3 bottom-1/4 left-1/3" />
-        <div className="gradient-bubble gradient-bubble-4 top-1/3 right-1/3" />
-        <div className="gradient-bubble gradient-bubble-5 bottom-1/3 left-1/2" />
-        <div className="gradient-bubble gradient-bubble-6 top-2/3 right-1/2" />
-      </div>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
+        className="w-full max-w-md"
       >
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold text-gradient">SocialPulse</span>
-          </div>
-          <p className="text-muted-foreground">AI-powered social media analytics</p>
-        </div>
-
         <div className="glass-card rounded-2xl p-8">
-          <h2 className="text-xl font-semibold text-foreground mb-6">Welcome back</h2>
+          <h2 className="text-xl font-semibold mb-6">Welcome back</h2>
 
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
@@ -61,51 +52,48 @@ const Login = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Email</label>
+
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border"
+              placeholder="Email"
+            />
+
+            <div className="relative">
               <input
-                type="email"
+                type={showPassword ? 'text' : 'password'}
                 required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                placeholder="you@example.com"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border pr-10"
+                placeholder="Password"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pr-10"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg gradient-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-lg bg-primary text-white flex items-center justify-center gap-2"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Sign in
+              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+              Sign In
             </button>
+
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-sm mt-6">
             Don't have an account?{' '}
-            <Link to="/register" className="text-primary hover:underline">
+            <Link to="/register" className="text-primary">
               Sign up
             </Link>
           </p>
@@ -116,8 +104,8 @@ const Login = () => {
 };
 
 const LoadingScreen = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  <div className="min-h-screen flex items-center justify-center">
+    <Loader2 className="w-8 h-8 animate-spin" />
   </div>
 );
 
